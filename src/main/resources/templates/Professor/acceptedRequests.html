@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Requests List</title>
+    <link href="../../static/style2.css" th:href="@{/style2.css}" rel="stylesheet" />
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          inherity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJLSAwiGgFAW/dAiS6JXm"
+          crossorigin="änonymous">
+
+    <style type="text/css">
+        body{
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),url(https://hdwallsource.com/img/2017/2/firewatch-landscape-wallpaper-59154-60938-hd-wallpapers.jpg);
+            background-size: cover;
+            font-family: "Times New Roman";
+            background-attachment: fixed;
+        }
+    </style>
+
+
+<body>
+<header>
+    <tbody>
+    <h1 class="heading">Λίστα Αποδεχτών Αιτήσεων</h1>
+    <div class="row2">
+        <div class="row d-flex justify-content-center">
+            <div class="table-container">
+
+                <div id="MyRequests"></div>
+
+<!--                create a table-->
+                <table class="table" id="display">
+                    <thead>
+                    <th>Id</th>
+                    <th>Όνομα φοιτητή</th>
+                    <th>Αίτημα φοιτητή</th>
+                    <th>Βαθμός</th>
+                    <th>Email εξωτερικού φορέα</th>
+                    <th class="text-center">Δημιουργία επιστολής</th>
+                    </thead>
+
+                    <tbody id="tbody1">
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="float-center"></td>
+                    </tbody>
+                </table>
+
+                <div id="searchAllAcceptedRequestsArea"></div>
+
+
+<!--                javascript-->
+                <script>
+                    window.addEventListener('load', (event) => {
+
+                        //professor views his accepted requests
+                        const xhr = new XMLHttpRequest();
+                        xhr.open('GET', 'http://localhost:8080/acceptedRequests', true);
+                        xhr.send();
+
+                        var table = document.getElementById("display");
+
+                        xhr.onreadystatechange = function () {
+                            if (xhr.readyState == 4) {
+                                if (xhr.status == 200) {
+                                    let divElem = document.getElementById('searchAllAcceptedRequestsArea');
+                                    const results = JSON.parse(xhr.responseText);
+                                    const item = results[0];
+                                    try {
+                                        divElem.innerHtml = `${item.id} ${item.name} ${item.text} ${item.mark}, ${item.mail}`;
+                                        console.log(divElem.innerHtml);
+                                    } catch (err) {
+                                        alert('You dont have any accepted request');
+                                        return false;
+                                    }
+
+                                    // load the elements from row=1 and then
+                                    var row = 1;
+
+                                    //pass the results to dynamic table
+                                    results.forEach((item) => {
+                                        var display = document.getElementById("display");
+                                        var ALLnewRow = display.insertRow(row);
+
+                                        var cellA1 = ALLnewRow.insertCell(0);
+                                        var cellA2 = ALLnewRow.insertCell(1);
+                                        var cellA3 = ALLnewRow.insertCell(2);
+                                        var cellA4 = ALLnewRow.insertCell(3);
+                                        var cellA5 = ALLnewRow.insertCell(4);
+                                        var cellA6 = ALLnewRow.insertCell(5);
+
+                                        cellA1.innerHTML = item.id;
+                                        cellA2.innerHTML = item.name;
+                                        cellA3.innerHTML = item.text;
+                                        cellA4.innerHTML = item.mark;
+                                        cellA5.innerHTML = item.mail;
+                                        // 6th cell has the button of making letter
+                                        cellA6.innerHTML = "<input th:href=\"{item.id}\" id=\"btn\" type=\"button\" class=\"btn\" value=\"Letter\"/>";
+
+                                        row++;
+
+                                        var index, table = document.getElementById('display');
+
+                                        //for making recommendation letter press the button of 6th cell
+                                        for (var i = 1; i < table.rows.length; i++) {
+                                            table.rows[i].cells[5].onclick = function () {
+
+
+                                                index = this.parentElement.rowIndex;
+                                                rid = this.parentElement.cells[0].innerHTML;
+                                                emailEx = this.parentElement.cells[4].innerHTML; //email ejoterikou forea
+
+
+                                                //set the rid (id of request) and emailEx (email of external body) and
+                                                // pass it to object: recommendation letter
+                                                sessionStorage.setItem("rid", rid);
+                                                sessionStorage.setItem("emailEx", emailEx);
+
+
+                                                //if click on button go to this page
+                                                location.href = "http://localhost:8080/addLetterPage";
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    });
+
+                </script>
+
+
+            </div>
+        </div>
+    </div>
+    </tbody>
+</header>
+</body>
+</html>

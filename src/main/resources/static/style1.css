@@ -1,0 +1,41 @@
+*{
+    margin:0;
+    padding:0;
+}
+.wrapper{
+    width: 1170px;
+    margin:auto;
+}
+
+.card-body{
+    text-align:center;
+    margin-bottom: 10px;
+}
+.form-control{
+    text-align:center;
+    margin-bottom: 10px;
+}
+.btn{
+    border:1px solid #fff;
+    padding:10px 25px;
+    text-decoration:none;
+    text-transform:uppercase;
+    font-size:14px;
+    margin-top:20px;
+    display:inline-block;
+    color:rebeccapurple;
+    box-shadow: -3px 6px 4px mediumpurple;
+}
+
+.btn:hover{
+    background:rebeccapurple;
+    color:white;
+    box-shadow: -3px 6px 4px indigo;
+}
+
+.flex-container{
+    width:1000px;
+    margin:01% 30%;
+
+
+}

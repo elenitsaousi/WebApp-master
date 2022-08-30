@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create a request</title>
+
+    <link href="../../static/style1.css" th:href="@{/style1.css}" rel="stylesheet"/>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          inherity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJLSAwiGgFAW/dAiS6JXm"
+          crossorigin="änonymous">
+
+    <style type="text/css">
+        body{
+            font-family: "Times New Roman";
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),url(https://wallpapercave.com/uwp/uwp1197581.jpeg);
+            background-size: cover;
+            background-attachment: fixed;
+        }
+    </style>
+
+
+<body>
+<head>
+    <div class="row">
+        <div class="container">
+            <div class="col-lg-6 col-md-6 col-sm-6 container justify-content-center card" style="background-color: cadetblue" >
+
+                <h1 class="text-center" style="color: #fdfbff">Φόρμα Αιτήματος</h1>
+
+                <div class="card-body">
+
+
+                    <div class="form-group" style="color: #FFFFFF">
+                        <label >Username: </label>
+                        <input
+                                type="text"
+                                name="name"
+                                id="userName"
+                                class="input-box"
+                                placeholder="george"
+                                className="m-translation-card__native-field-label"
+                        />
+                        <span lang="gr"></span>
+                    </div>
+
+
+                    <label style="color: #FFFFFF">Ρόλος: </label>
+                    <select name="roles" id="roles" style="color: lightseagreen">
+                        <option value="" disabled selected>Επέλεξε ρόλο χρήστη</option>
+                        <option value="ROLE_PROFESSOR">Καθηγητής</option>
+                        <option value="ROLE_STUDENT">Φοιτητής</option>
+                    </select>
+
+
+                    <div class="form-group" style="color: #FFFFFF">
+                        <label>Password: </label>
+                        <input
+                                id="password1"
+                                type="password"
+                                class="input-box"
+
+                        />
+                    </div>
+                    <div class="form-group" style="color: #FFFFFF">
+                        <label>Password: </label>
+                        <i class="fa fa-cloud"></i>
+                        <input
+                                id="password"
+                                type="password"
+                                class="input-box"
+
+
+                        />
+
+                    </div>
+
+                    <div class="form-group" style="color: #FFFFFF">
+                        <p><span><input type="checkbox"></span> I agree to the terms of services</p>
+                    </div>
+
+                    <button type="submit" class="btn" id="sendUser">
+                        Δημιουργία
+                    </button>
+
+
+                    <!--                    javascript-->
+                    <script type="text/javascript">
+
+                        window.addEventListener('load', (event) => {
+                            document.getElementById('sendUser').addEventListener('click', (event) => {
+
+                                // const bcrypt = getPasswordEncoder();
+
+                                //create object: User
+                                const User = {
+
+                                    'userName': document.getElementById('userName').value,
+                                    'password': document.getElementById('password').value,
+                                    'roles': document.getElementById('roles').value,
+
+                                };
+
+                                var user_nameformat= /[a-z]/;
+                                var name= document.getElementById("userName").value;
+
+                                //check if an element is empty or has worn input and make red the border color
+                                if (document.getElementById('userName').value === "" || !name.match(user_nameformat)) {
+                                    alert("complete all the fields with correct input")
+                                    document.getElementById('userName').style.borderColor = " red";
+                                    return false
+                                }
+
+                                if (document.getElementById('roles').value === "") {
+                                    alert("complete all the fields!")
+                                    document.getElementById('roles').style.borderColor = " red";
+                                    return false
+                                }
+
+                                if (document.getElementById('password1').value === "") {
+                                    alert("complete all the fields with correct input")
+                                    document.getElementById('password1').style.borderColor = " red";
+                                    return false
+                                }
+
+                                if (document.getElementById('password1').value === "") {
+                                    alert("complete all the fields with correct input")
+                                    document.getElementById('password1').style.borderColor = " red";
+                                    return false
+                                }
+
+                                if (!document.getElementById('password').value.match(document.getElementById('password1').value) ) {
+                                    alert("passwords are different!")
+                                    document.getElementById('password').style.borderColor = " red";
+                                    return false
+                                }
+
+
+
+                                var xhr = new XMLHttpRequest();
+                                xhr.open("POST", 'http://localhost:8080/register', true);
+                                xhr.setRequestHeader("Content-Type", "application/json");
+
+                                xhr.onreadystatechange = function() {
+                                    if (xhr.readyState == 4) {
+                                        if (xhr.status == 200) {
+                                            alert(xhr.responseText);
+                                            //after the submit go to main page
+
+                                            location.href = "http://localhost:8080/homepage#mainpage";
+                                        }
+                                    }
+
+                                };
+                                xhr.send(JSON.stringify(User));
+                                return passwordEncoder.encode("password");
+                            });
+                        });
+                    </script>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</head>
+</body>
+</html>

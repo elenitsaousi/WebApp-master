@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create a request</title>
+    <link href="../../static/style1.css" th:href="@{/style1.css}" rel="stylesheet"/>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          inherity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJLSAwiGgFAW/dAiS6JXm"
+          crossorigin="änonymous">
+
+    <style type="text/css">
+        body{
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),url(https://wallpapercave.com/uwp/uwp1197581.jpeg);
+            background-size: cover;
+            font-family: "Times New Roman";
+            background-attachment: fixed;
+        }
+    </style>
+
+
+<body>
+<head>
+    <div class="row">
+        <div class="container">
+            <div class="col-lg-6 col-md-6 col-sm-6 container justify-content-center card" style="background-color: cadetblue" >
+
+                <h1 class="text-center" style="color: #fdfbff">Επεξεργασία χρήστη</h1>
+
+                <div class="card-body">
+
+
+                    <div class="form-group" style="color: #FFFFFF">
+                        <label >Username: </label>
+                        <input
+                                type="text"
+                                name="name"
+                                id="userName"
+                                class="input-box"
+                                placeholder="george"
+                                className="m-translation-card__native-field-label"
+                        />
+                        <span lang="gr"></span>
+                    </div>
+
+
+                    <label style="color: #FFFFFF">Ρόλος: </label>
+                    <select name="roles" id="roles" style="color: lightseagreen">
+                        <option value="" disabled selected>Επέλεξε ρόλο χρήστη</option>
+                        <option value="ROLE_PROFESSOR">Καθηγητής</option>
+                        <option value="ROLE_STUDENT">Φοιτητής</option>
+                    </select>
+
+
+                    <button type="submit" class="btn" id="sendRequest">
+                        Υποβολή
+                    </button>
+
+
+                    <script type="text/javascript">
+                        window.addEventListener('load', (event) => {
+                            document.getElementById('sendRequest').addEventListener('click', (event) => {
+                                const User = {
+                                    'userName': document.getElementById('userName').value,
+                                    'roles': document.getElementById('roles').value,
+                                };
+
+
+                                var user_nameformat=/^[a-zA-Z\s]*$/;
+                                var name= document.getElementById("userName").value;
+
+                                //check if an element is empty or has worn input and make red the border color
+                                if (document.getElementById('userName').value === "" || !name.match(user_nameformat)) {
+                                    alert("complete all the fields with correct input!")
+                                    document.getElementById('userName').style.borderColor = " red";
+                                    return false
+                                }
+
+                                if (document.getElementById('roles').value === "") {
+                                    alert("complete all the fields!")
+                                    document.getElementById('roles').style.borderColor = " red";
+                                    return false
+                                }
+
+                                var json = JSON.stringify(User);
+
+                                //get the id of request that clicked on from the table of requestsPage
+                                var id=sessionStorage.getItem("id");
+
+                                let xhr = new XMLHttpRequest();
+
+                                //edit object with this rid
+                                xhr.open("PUT", `http://localhost:8080/editUser/` + id, true);
+                                xhr.setRequestHeader('Content-type', 'application/json;');
+
+
+                                xhr.onload = function () {
+
+                                    if (xhr.readyState == 4 && xhr.status == "200") {
+                                        alert(xhr.responseText);
+
+                                        //after submit go to main page
+                                        location.href = "http://localhost:8080/homepage#mainpage";
+
+                                    } else {
+                                        return null;
+                                    }
+                                }
+                                xhr.send(json);
+                            });
+                        });
+                    </script>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</head>
+</body>
+</html>

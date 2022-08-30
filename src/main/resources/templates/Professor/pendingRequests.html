@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Pending Requests</title>
+    <link href="../../static/style2.css" th:href="@{/style2.css}" rel="stylesheet" />
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          inherity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJLSAwiGgFAW/dAiS6JXm"
+          crossorigin="änonymous">
+
+    <style type="text/css">
+        body{
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),url(https://hdwallsource.com/img/2017/2/firewatch-landscape-wallpaper-59154-60938-hd-wallpapers.jpg);
+            background-size: cover;
+            font-family: "Times New Roman";
+            background-attachment: fixed;
+        }
+    </style>
+<body>
+
+    <h1 class="heading">Εκκρεμείς Αιτήσεις Φοιτητών</h1>
+    <div class="row2">
+        <div class="row d-flex justify-content-center">
+            <div class="table-container">
+
+                <div id="PendingLetters"></div>
+                <table class="table" id="display">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Όνομα φοιτητή</th>
+                        <th>Αίτημα φοιτητή</th>
+                        <th>Βαθμός</th>
+                        <th>Email εξωτερικού φορέα</th>
+                        <th class="text-center">Αποδοχή</th>
+                        <th class="text-center">Απόρριψη</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="tbody1">
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="float-center"></td>
+                        <td class="float-center"></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div id="searchAllPendingRequestsArea"></div>
+                <script>
+                    window.addEventListener('load', (event) => {
+                        const xhr = new XMLHttpRequest();
+
+                        //get method for pending requests
+                        xhr.open('GET', 'http://localhost:8080/pendingRequests', true);
+                        xhr.send();
+
+                        var table = document.getElementById("display");
+
+                        xhr.onreadystatechange = function () {
+                            if (xhr.readyState == 4) {
+                                if (xhr.status == 200) {
+
+                                    let divElem = document.getElementById('searchAllPendingRequestsArea');
+                                    const results = JSON.parse(xhr.responseText);
+                                    const item = results[0];
+                                    try {
+                                        divElem.innerHtml = `${item.id} ${item.name} ${item.text} ${item.mark} ${item.mail} `;
+                                        console.log(divElem.innerHtml);
+                                    } catch (err) {
+                                        alert('You dont have any pending request');
+                                        return false;
+                                    }
+
+                                    //load the elements from row=1 and after
+                                    var row = 1;
+
+                                    //display the elements on the table
+                                    results.forEach((item) => {
+                                        var display = document.getElementById("display");
+                                        var AllNewRow = display.insertRow(row);
+                                        var cellA1 = AllNewRow.insertCell(0);
+                                        var cellA2 = AllNewRow.insertCell(1);
+                                        var cellA3 = AllNewRow.insertCell(2);
+                                        var cellA4 = AllNewRow.insertCell(3);
+                                        var cellA5 = AllNewRow.insertCell(4);
+                                        var cellA6 = AllNewRow.insertCell(5);
+                                        var cellA7 = AllNewRow.insertCell(6);
+
+                                        cellA1.innerHTML = item.id;
+                                        cellA2.innerHTML = item.name;
+                                        cellA3.innerHTML = item.text;
+                                        cellA4.innerHTML = item.mark;
+                                        cellA5.innerHTML = item.mail;
+                                        cellA6.innerHTML = "<input  id=\"btn1\" type=\"button\" class=\"btn1\" value=\"Accept\" />";
+                                        cellA7.innerHTML = "<input  id=\"btn2\" type=\"button\" class=\"btn2\" value=\"Reject\" />";
+                                        row++;
+
+                                        var index, table=document.getElementById('display');
+                                        for(var i=1; i<table.rows.length; i++) {
+
+                                            //if click on button of 6th cell, change the status from pending to accepted
+                                            table.rows[i].cells[5].onclick = function () {
+                                                let text = "Are you sure you want to accept this recommendation letter?";
+                                                if (confirm(text) == true) {
+                                                    index = this.parentElement.rowIndex;
+                                                    rid = this.parentElement.cells[0].innerHTML;
+                                                    table.deleteRow(index);
+
+
+                                                    var requests = {};
+                                                    requests.status = "Accepted";
+                                                    var json = JSON.stringify(requests);
+
+                                                    let xhr = new XMLHttpRequest();
+
+                                                    //put method to edit the status of request
+                                                    xhr.open("PUT", `http://localhost:8080/setRequestStatus/` + rid, true);
+                                                    xhr.setRequestHeader('Content-type', 'application/json;');
+
+                                                    xhr.onload = function () {
+                                                        let question = JSON.parse(xhr.responseText);
+                                                        if (xhr.readyState == 4 && xhr.status == "200") {
+                                                            console.table(display);
+                                                        } else {
+                                                            // console.error(question);
+                                                        }
+                                                    }
+                                                    xhr.send(json);
+                                                }else{
+                                                    return null;
+                                                }
+                                            };
+
+                                        }
+
+                                        for(var i=1; i<table.rows.length; i++) {
+
+                                            //if click on button of 7th cell, change the status from pending to rejected
+                                            table.rows[i].cells[6].onclick = function () {
+
+                                                let text = "Are you sure you want to reject this recommendation letter?";
+                                                if (confirm(text) == true) {
+                                                    index = this.parentElement.rowIndex;
+                                                    rid = this.parentElement.cells[0].innerHTML;
+                                                    table.deleteRow(index);
+                                                    var requests = {};
+                                                    requests.status = "Rejected";
+                                                    var json = JSON.stringify(requests);
+
+                                                    let xhr = new XMLHttpRequest();
+                                                    //put method to edit the status of request
+                                                    xhr.open("PUT", `http://localhost:8080/setRequestStatus/` + rid, true);
+                                                    xhr.setRequestHeader('Content-type', 'application/json;');
+                                                    xhr.onload = function () {
+                                                        let question = JSON.parse(xhr.responseText);
+                                                        if (xhr.readyState == 4 && xhr.status == "200") {
+                                                            console.table(display);
+                                                        } else {
+                                                            // console.error(question);
+                                                        }
+                                                    }
+                                                    xhr.send(json);
+                                                }else{
+                                                    return null;
+                                                }
+
+
+
+                                            };
+
+                                        }
+
+                                    });
+                                }
+                            }
+                        }
+                    });
+
+                </script>
+
+
+            </div>
+        </div>
+    </div>
+    </div>
+
+</body>
+</html>
+
+
+</div>
+</div>
+</div>
+</div>
+</header>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Requests List</title>
+    <link href="../../static/style2.css" th:href="@{/style2.css}" rel="stylesheet" />
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          inherity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJLSAwiGgFAW/dAiS6JXm"
+          crossorigin="änonymous">
+
+    <style type="text/css">
+        body{
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),url(https://hdwallsource.com/img/2017/2/firewatch-landscape-wallpaper-59154-60938-hd-wallpapers.jpg);
+            background-size: cover;
+            font-family: "Times New Roman";
+            background-attachment: fixed;
+        }
+    </style>
+
+<body>
+<header>
+    <tbody>
+    <h1 class="heading">My Application List</h1>
+    <div class="row2">
+        <div class="row d-flex justify-content-center">
+            <div class="table-container">
+
+                <div id="MyRequests"></div>
+                <table class="table" id="display">
+                    <thead>
+                    <th>Μοναδικος αριθμος (ID)</th>
+                    <th>Βαθμός</th>
+                    <th>Όνομα καθηγητή</th>
+                    <th>Κατάσταση</th>
+                    <th>Επεξεργασία</th>
+                    <th>Διαγραφή</th>
+                    </thead>
+
+                    <tbody id="tbody1">
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="float-center"></td>
+                    </tbody>
+                </table>
+
+                <div id="searchAllRequestsArea"></div>
+                <script>
+                    window.addEventListener('load', (event) => {
+                        const xhr = new XMLHttpRequest();
+                        //get method to get the student his requests
+                        xhr.open('GET', 'http://localhost:8080/requests', true);
+                        xhr.send();
+
+                        var table = document.getElementById("display");
+
+                        xhr.onreadystatechange = function () {
+                            if (xhr.readyState == 4) {
+                                if (xhr.status == 200) {
+                                    let divElem = document.getElementById('searchAllRequestsArea');
+                                    const results = JSON.parse(xhr.responseText);
+                                    const item = results[0];
+                                    try {
+                                        divElem.innerHtml = `${item.id} ${item.mark} ${item.dest} ${item.status}`;
+
+                                        console.log(divElem.innerHtml);
+                                    } catch (err) {
+                                        alert('You dont have any request');
+                                        return false;
+                                    }
+
+                                    //load the elements from row=1 and then
+                                    var row = 1;
+
+                                    results.forEach((item) => {
+                                        //display the elements on the table
+                                        var display = document.getElementById("display");
+                                        var ALLnewRow = display.insertRow(row);
+
+                                        var cellA1 = ALLnewRow.insertCell(0);
+                                        var cellA2 = ALLnewRow.insertCell(1);
+                                        var cellA3 = ALLnewRow.insertCell(2);
+                                        var cellA4 = ALLnewRow.insertCell(3);
+                                        var cellA5 = ALLnewRow.insertCell(4);
+                                        var cellA6 = ALLnewRow.insertCell(5);
+
+                                        cellA1.innerHTML = item.id;
+                                        cellA2.innerHTML = item.mark;
+                                        cellA3.innerHTML = item.dest;
+                                        cellA4.innerHTML = item.status;
+                                        cellA5.innerHTML = "<input th:href=\"{item.id}\" id=\"btn\" type=\"button\" class=\"btn\" value=\"Edit\" />";
+                                        cellA6.innerHTML = "<input th:href=\"{item.id}\" id=\"btn\" type=\"button\" class=\"btn\" value=\"Delete\" />";
+
+                                        row++;
+
+
+                                        var index, table=document.getElementById('display');
+                                        for(var i=1; i<table.rows.length; i++){
+                                            //if click on button of 6th cell
+                                            table.rows[i].cells[5].onclick=function() {
+
+                                                //get the status of this request
+                                                state=this.parentElement.cells[3].innerHTML
+
+                                                //if it is accepted show error message
+                                                if(state==="Accepted") {
+                                                    alert("You can't delete accepted requests!");
+
+                                                }else {
+                                                    let text = "Are you sure you want to delete this request?";
+
+                                                    if (confirm(text) == true) {
+
+                                                        index = this.parentElement.rowIndex;
+                                                        rid = this.parentElement.cells[0].innerHTML
+                                                        table.deleteRow(index);
+                                                        let xhr = new XMLHttpRequest();
+
+                                                        //delete method for request with this id
+                                                        xhr.open("DELETE", `http://localhost:8080/deleteRequest/` + rid, true);
+                                                        xhr.setRequestHeader('Content-type', 'application/json;');
+                                                        xhr.onload = function () {
+                                                            let question = JSON.parse(xhr.responseText);
+                                                            if (xhr.readyState == 4 && xhr.status == "200") {
+                                                                console.table(display);
+                                                            } else {
+                                                                // console.error(question);
+                                                            }
+                                                        }
+                                                        xhr.send(null);
+
+                                                    } else {
+                                                        return null;
+                                                    }
+                                                }
+                                            };
+
+                                            //if click on the button of 5th cell
+                                            table.rows[i].cells[4].onclick=function() {
+                                                //get the status of request
+                                                state=this.parentElement.cells[3].innerHTML
+                                                //if status is pending edit is able
+                                                if(state==="Pending") {
+
+
+                                                    index = this.parentElement.rowIndex;
+
+                                                    var rid = this.parentElement.cells[0].innerHTML;
+                                                    //set the id of request and id of the table
+                                                    sessionStorage.setItem("rid", rid);
+
+                                                    //and go to the edit page
+                                                    location.href = "http://localhost:8080/editRequestPage/{requestId}";
+
+                                                }
+                                                //else display error message
+                                                else {
+                                                    alert("Only pending requests you can edit!");
+                                                }
+                                            };
+                                        }
+
+                                    });
+
+                                }
+
+                            }
+
+                        }
+
+                    });
+
+                </script>
+
+            </div>
+        </div>
+    </div>
+    </tbody>
+</header>
+</body>
+</html>

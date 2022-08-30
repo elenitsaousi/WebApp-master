@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create a request</title>
+    <link href="../../static/style1.css" th:href="@{/style1.css}" rel="stylesheet"/>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          inherity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJLSAwiGgFAW/dAiS6JXm"
+          crossorigin="änonymous">
+
+    <style type="text/css">
+        body{
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),url(https://wallpapercave.com/uwp/uwp1197581.jpeg);
+            background-size: cover;
+            font-family: "Times New Roman";
+            background-attachment: fixed;
+        }
+    </style>
+
+
+<body>
+<head>
+    <div class="row">
+        <div class="container">
+            <div class="col-lg-6 col-md-6 col-sm-6 container justify-content-center card" style="background-color: cadetblue" >
+
+                <h1 class="text-center" style="color: #fdfbff">Φόρμα Αιτήματος</h1>
+
+                <div class="card-body">
+
+
+                    <div class="form-group" style="color: #FFFFFF">
+                        <label>Όνομα: </label>
+                        <input
+                                type="text"
+                                name="name"
+                                id="name"
+                                class="form-control"
+                                placeholder="E.g. Ioannis Papadimitriou"
+                        />
+                    </div>
+
+                    <div class="form-group" style="color: #FFFFFF">
+                        <label>Email: </label>
+                        <input
+                                type="text"
+                                name="email"
+                                id="email"
+                                class="form-control"
+                                placeholder="E.g. john@gmail.com"
+                        />
+                    </div>
+
+
+                    <label style="color: #FFFFFF">Όνομα καθηγητή: </label>
+                    <select name="dest" id="dest" style="color: lightseagreen">
+                        <option value="" disabled selected>Επέλεξε καθηγητή</option>
+                        <option value="vaggelis">Βαγγέλης</option>
+                        <option value="xristina">Χριστίνα</option>
+                        <option value="adonis">Αντώνης</option>
+                    </select>
+
+                    <div class="form-group" style="color: #FFFFFF">
+                        <label>Βαθμός: </label>
+                        <input
+                                type="number"
+                                name="mark"
+                                id="mark"
+                                min="0"
+                                max="10"
+                                class="form-control"
+                                placeholder="E.g. 8"
+                        />
+                    </div>
+
+
+                    <div class="form-group" style="color: #FFFFFF">
+                        <label>Αίτημα: </label>
+                        <textarea
+                                type="text"
+                                name="text"
+                                id="text"
+                                rows="6"
+                                class="form-control"
+                        ></textarea>
+
+                    </div>
+
+                    <div class="form-group" style="color: #FFFFFF">
+                        <label>Email εξωτερικού φορέα: </label>
+                        <input
+                                id="mail"
+                                type="text"
+                                class="form-control"
+                                placeholder="E.g. company@gmail.com"
+                        />
+
+                    </div>
+
+                    <button type="submit" class="btn" id="sendRequest">
+                        Υποβολή
+                    </button>
+
+
+                    <script type="text/javascript">
+                        window.addEventListener('load', (event) => {
+                            document.getElementById('sendRequest').addEventListener('click', (event) => {
+                                const Request = {
+                                    'name': document.getElementById('name').value,
+                                    'email': document.getElementById('email').value,
+                                    'mark': document.getElementById('mark').value,
+                                    'dest': document.getElementById('dest').value,
+                                    'text': document.getElementById('text').value,
+                                    'mail': document.getElementById('mail').value
+                                };
+
+
+                                var nameformat=/^[α-ωΑ-Ω\s]*$/;
+                                var mailformat = /[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+                                var email = document.getElementById("email").value;
+                                var mail = document.getElementById("mail").value;
+                                var name= document.getElementById("name").value;
+
+                                //check if an element is empty or if has wrong input and if yes make red the border
+                                if (document.getElementById('name').value === "" || !name.match(nameformat)) {
+                                    alert("complete all the fields with correct input and greek characters to your name!")
+                                    document.getElementById('name').style.borderColor = " red";
+                                    return false
+                                }
+
+                                if (document.getElementById('email').value === "" || !email.match(mailformat)) {
+                                    alert("complete all the fields with correct input!")
+                                    document.getElementById('email').style.borderColor = " red";
+                                    return false
+                                }
+
+                                if (document.getElementById('dest').value === "") {
+                                    alert("complete all the fields!")
+                                    document.getElementById('dest').style.borderColor = " red";
+                                    return false
+                                }
+
+                                if (document.getElementById('mark').value === "") {
+                                    alert("complete all the fields")
+                                    document.getElementById('mark').style.borderColor = " red";
+                                    return false
+                                }
+                                if (document.getElementById('mark').value < 0 || document.getElementById('mark').value > 10) {
+                                    alert("please enter a number between 0 and 10")
+                                    document.getElementById('mark').style.borderColor = " red";
+                                    return false
+                                }
+
+                                if (document.getElementById('text').value === "") {
+                                    alert("complete all the fields!")
+                                    document.getElementById('text').style.borderColor = " red";
+                                    return false
+                                }
+
+                                if (document.getElementById('mail').value === "" || !mail.match(mailformat)) {
+                                    alert("complete all the fields with correct input!")
+                                    document.getElementById('mail').style.borderColor = " red";
+                                    return false
+                                }
+
+                                var json = JSON.stringify(Request);
+
+                                //get the id of request that clicked on from the table of requestsPage
+                                var rid=sessionStorage.getItem("rid");
+
+                                let xhr = new XMLHttpRequest();
+
+                                //edit object with this rid
+                                xhr.open("PUT", `http://localhost:8080/editRequest/` + rid, true);
+                                xhr.setRequestHeader('Content-type', 'application/json;');
+
+
+                                xhr.onload = function () {
+
+                                    if (xhr.readyState == 4 && xhr.status == "200") {
+                                        alert(xhr.responseText);
+
+                                        //after submit go to main page
+                                        location.href = "http://localhost:8080/homepage#mainpage";
+
+                                    } else {
+                                        return null;
+                                    }
+                                }
+                                xhr.send(json);
+                            });
+                        });
+                    </script>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</head>
+</body>
+</html>

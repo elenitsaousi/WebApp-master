@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create a request</title>
+    <link href="../../static/style1.css" th:href="@{/style1.css}" rel="stylesheet" />
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          inherity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJLSAwiGgFAW/dAiS6JXm"
+          crossorigin="änonymous">
+
+    <style type="text/css">
+        body{
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),url(https://wallpapercave.com/uwp/uwp1197581.jpeg);
+            background-size: cover;
+            font-family: "Times New Roman";
+            background-attachment: fixed;
+        }
+
+    </style>
+
+
+</head>
+<body>
+<header>
+    <div class="row">
+        <div class="container" >
+            <div class="col-lg-6 col-md-6 col-sm-6 container justify-content-center card" style="background-color: cadetblue" >
+
+                <h1 class="text-center" style="color: #fdfbff">Φόρμα Συστατικής επιστολής</h1>
+
+                <div class="card-body">
+                    <div class="form-group" style="color: #FFFFFF">
+                        <label>Όνομα: </label>
+                        <input
+                                type="text"
+                                name="name"
+                                id="name"
+                                class="form-control"
+                                placeholder="Enter your name"
+                        />
+                    </div>
+
+                    <div class="form-group" style="color: #FFFFFF">
+                        <label>Your email: </label>
+                        <input
+                                type="text"
+                                name="email"
+                                id="prof_email"
+                                class="form-control"
+                                placeholder="E.g. john@gmail.com"
+                        />
+                    </div>
+
+                    <div class="form-group" style="color: #FFFFFF">
+                        <label>Συστατική επιστολή: </label>
+                        <input type="file" id="text" name="text" accept=".pdf,.doc,.docx"/>
+
+                    </div>
+
+                    <button type="submit" class="btn" id="sendRequest" this.disabled=true;>
+                        Υποβολή
+                    </button>
+
+                    <script type="text/javascript">
+                        window.addEventListener('load', (event) => {
+                            document.getElementById('sendRequest').addEventListener('click', (event) => {
+
+                                //create an object: recommendationLetters
+                                const RecommendationLetters = {
+                                    'rid': sessionStorage.getItem("rid"),
+                                    'name': document.getElementById('name').value,
+                                    'prof_email': document.getElementById('prof_email').value,
+                                    'email': sessionStorage.getItem("emailEx"),
+                                    'text': document.getElementById('text').value
+                                };
+                                var nameformat=/^[α-ζΑ-Ζ]/g;
+                                var mailformat = /[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+                                var prof_email = document.getElementById("prof_email").value;
+                                var name= document.getElementById("name").value;
+
+                                //check if an element is empty or if has wrong input
+                                if (document.getElementById('name').value === "" || !name.match(nameformat)) {
+                                    alert("complete all the fields with correct input and greek characters to your name!")
+                                    document.getElementById('name').style.borderColor = " red";
+                                    return false
+                                }
+
+                                if (document.getElementById('prof_email').value == "" || !prof_email.match(mailformat)) {
+                                    alert("complete all the fields with correct input!")
+                                    document.getElementById('prof_email').value
+                                    return false
+                                }
+
+
+                                if (document.getElementById('text').value == "") {
+                                    alert("complete all the fields")
+                                    document.getElementById('text').value
+                                    return false
+                                }
+
+                                var xhr = new XMLHttpRequest();
+
+                                //post method for creating an object
+                                xhr.open("POST", 'http://localhost:8080/addLetter', true);
+                                xhr.setRequestHeader("Content-Type", "application/json");
+                                xhr.onreadystatechange = function() {
+                                    if (xhr.readyState == 4) {
+                                        if (xhr.status == 200) {
+                                            alert(xhr.responseText);
+
+                                            //after the successfull submit go to main page
+                                            location.href = "http://localhost:8080/homepage#mainpage";
+
+                                        }
+                                    }
+
+                                    //after the successfull submit change the status of request from accepted to done
+                                    var requests = {};
+                                    requests.status = "Done";
+                                    var json = JSON.stringify(requests);
+
+                                    //get the rid from the table on viewLettersPage
+                                    var rid= sessionStorage.getItem("rid")
+
+                                    let xhr1 = new XMLHttpRequest();
+                                    //put method to change the status of request
+                                    xhr1.open("PUT", `http://localhost:8080/setRequestStatus/` + rid, true);
+                                    xhr1.setRequestHeader('Content-type', 'application/json;');
+
+                                    xhr1.onload = function () {
+                                        let question = JSON.parse(xhr1.responseText);
+                                        if (xhr1.readyState == 4 && xhr1.status == "200") {
+                                            console.table(display);
+                                        } else {
+                                            // console.error(question);
+                                        }
+                                    }
+                                    xhr1.send(json);
+
+                                };
+
+                                xhr.send(JSON.stringify(RecommendationLetters));
+
+
+                            });
+
+                        });
+                    </script>
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+</header>
+</body>
+</html>
